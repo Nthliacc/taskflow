@@ -1,0 +1,42 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./TaskFlow-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - taskflow-network
+
+  backend:
+    build:
+      context: ./TaskFlow-backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgres://user:password@database:5432/todo_list
+    depends_on:
+      - database
+    networks:
+      - taskflow-network
+
+  database:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: todo_list
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - taskflow-network
+
+networks:
+  taskflow-network:
+
+volumes:
+  postgres-data:
